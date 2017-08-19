@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/augmentation-layer.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/tingle/dist/tingle.min.css">
+
+    <script type="text/javascript" src="../vendor/tingle/dist/tingle.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+    <script type="text/javascript" src="../js/augmenter-parameters.js"></script>
+    
+    <script type="text/javascript">
+
+        MHAppsBuilder.prototype.loadFormTitle = function(){
+
+            var aug = MoWA.getCurrentAugmenterInstance(window);
+            
+            document.querySelector("#augmenterName").innerHTML = aug.locale["augmenter.name"] || "";
+        }
+        MHAppsBuilder.prototype.loadDescriptionField = function(){
+
+            var param = MoWA.getCurrentAugmenter().getParameter("description");
+            document.querySelector("#description").value = (new TextualParameter(param)).getValue() || "";
+        }
+        MHAppsBuilder.prototype.saveTitleField = function(){
+
+            var value = document.querySelector("#description").value;
+            if(value && value.length && value.trim().length > 0){
+
+                MoWA.setCurrentAugmenterParam("description", {
+                    "className": "TextualParameter", 
+                    "value": value
+                });
+                MoWA.saveAppInSessionIntoFile();
+            }
+        }
+
+        try{
+
+            window.appBuilder = new MHAppsBuilder(); 
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(); 
+                appBuilder.disableLoadingEffect();
+                appBuilder.loadDescriptionField();
+
+                console.log(window);  
+                
+                appBuilder.loadFormTitle();       
+
+            });
+        }catch(err){console.log(err.message)}
+
+        window.onload = function(){
+
+            appBuilder.enableLoadingEffect();
+            document.querySelector(".previous > a").onclick = function(){
+                appBuilder.loadUriWithApi("augmentations/augmentation-layer.html");
+            }
+            document.querySelector(".next > a").onclick = function(){    
+                appBuilder.saveTitleField();
+                appBuilder.loadUriWithApi("augmentations/augmentation-layer.html");
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span id="augmenterName"></span> 
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p data-l10n-id="augmentations.help"></p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+            <!-- :::::::::: TITLE :::::::::: -->
+            <div class="form-group">
+                <label data-l10n-id="app.setup.name"></label>
+                <input id="description" type="text" class="form-control" placeholder="E.g. Darwin's tour" required="true" onchange="appBuilder.saveTitleField()"></input>
+            </div>
+        </form>
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='fa fa-caret-left'></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span data-l10n-id="save"></span>
+                    <i class="glyphicon glyphicon-floppy-disk"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

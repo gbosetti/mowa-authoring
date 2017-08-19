@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+
+    <script type="text/javascript">
+
+        MHAppsBuilder.prototype.createNewEmptyContextValue = function(){
+
+            MoWA.createNewEmptyContextValueByManager("OrientationManager")
+        }
+
+        // Form initialization
+        try{
+            window.appBuilder = new MHAppsBuilder();
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize();
+
+                var orientations = MoWA.getContextValuesByManager("OrientationManager");
+
+                //TIENEN REALMENTE ESTE MÉTODO? POR QUÉ VIENE UN UNDEFINED???????
+                for (var i = orientations.length - 1; i >= 0; i--) {
+
+                    orientations[i].displayInList(appBuilder);
+                }
+
+                appBuilder.setCurrentContextManager("OrientationManager");
+                appBuilder.disableLoadingEffect();
+            });
+        }catch(err){console.log(err.message)}
+
+        // Attaching behaviour to the UI components
+        window.onload = function(){
+            appBuilder.enableLoadingEffect();
+            document.querySelector("#newContextValue").onclick = function(){
+                appBuilder.createNewEmptyContextValue();
+                appBuilder.loadOrientationSetup();
+            }
+            document.querySelector(".previous > a").onclick = function(){
+                appBuilder.navigateToPrevStepFromSensorForm();
+            }
+            document.querySelector(".next > a").onclick = function(){
+                appBuilder.navigateToNextStepFromSensorForm();
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="yellow-navbar navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span data-l10n-id="orientations.title" ></span>
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+        <div class="progress heading-progress">
+            <div class="progress-bar progress-bar-info" style="width: 25%"></div>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p data-l10n-id="orientations.intructions"></p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+            <!-- :::::::::: LIST OFCONTEXT VALUES :::::::::: -->
+
+            <div id="orientations" class="list-group">
+
+            </div>
+
+            <div class="form-group">
+                <button id="newContextValue" type="button" class="btn pull-right btn-default">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <span data-l10n-id="new.orientation"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='fa fa-caret-left'></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span data-l10n-id="next.step"></span>
+                    <i class="fa fa-caret-right"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

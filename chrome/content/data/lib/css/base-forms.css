@@ -1,0 +1,96 @@
+/*.yellow-navbar{
+    background: #F1B500 !important;
+}
+.green-navbar{
+    background: #96B475 !important;
+}
+.red-navbar{
+    background: #c71c22 !important;
+}
+.blue-navbar{
+    background: #178acc !important;
+}
+*/
+
+
+.heading-progress {
+    height: 5px !important;
+    margin-bottom: 0px !important;
+}
+.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+    /*background: rgba(1,1,1,0.2) !important;*/
+    border: none !important;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: white !important;
+}
+.navbar-default {
+    border-bottom: none !important;
+}
+
+.loading {
+    display:    block;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .5 )
+                url('../img/loading.gif')
+                50% 50%
+                no-repeat;
+}
+.list-group-item{
+    font-size: 0.9em !important;
+    overflow: hidden !important;
+}
+.list-group-item:active {
+    background-color: rgba(29, 156, 229, 0.5);
+    color: white;
+}
+.navbar-brand > img {
+    display: inline-block !important;
+    max-height: 45px !important;
+}
+.mowa-navbar-icon{
+	color: white !important;
+}
+.form-container{
+    padding-bottom: 60px !important;
+}
+.help{
+	display: none;
+	padding-bottom: 1em;
+}
+.ui-widget-header{
+    background: rgb(47, 164, 231) !important;
+    border-color: rgb(25, 149, 220) !important;
+}
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    margin-bottom: 60px; /* bottom has to be the same as footer height */
+    font-size: 1.6em !important;
+}
+footer {
+    background-color: #F8F8F8;
+    border-top: 1px solid #E7E7E7;
+    text-align:center;
+    padding: 12px 20px;
+    margin-top: -60px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 60px; /*90px;*/
+    width: 100%;
+}
+.pager{
+	margin: 0px !important;
+}
+.navbar-brand span {
+	font-weight: bold;
+}

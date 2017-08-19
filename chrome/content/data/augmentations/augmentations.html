@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/augmentation-layer.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/tingle/dist/tingle.min.css">
+
+    <script type="text/javascript" src="../vendor/tingle/dist/tingle.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+    
+    <script type="text/javascript">
+
+        MHAppsBuilder.prototype.loadAvailableAugmentations = function(){
+            var augmentations = MoWA.getAugmentations(); 
+
+            if(augmentations.length>0){
+
+                document.querySelector(".progress-bar").style.width = "95%";
+
+                for (var i = augmentations.length - 1; i >= 0; i--) {
+                    this.displayAugmentationInList(augmentations[i]);
+                }
+            }
+            else this.displayNoAugmentation();
+        }
+        MHAppsBuilder.prototype.reloadAvailableAugmentations = function(){
+            document.querySelector("#augmentations").innerHTML = "";
+            this.loadAvailableAugmentations();
+        }
+        MHAppsBuilder.prototype.displayNoAugmentation = function() {
+
+            var box = this.createNoItemBox(this.getLocalString('no.augmentation'));
+            this.append(box, "#augmentations");
+        }
+        MHAppsBuilder.prototype.displayAugmentationInList = function(aug) {
+
+            var me = this;
+            var box = this.createUserDefValueBox("list-group-item"); 
+                box.id = aug.id;
+                box.appendChild(this.createUserDefBoxControls(function(e){
+                    e.stopImmediatePropagation(); e.preventDefault();
+                    me.removeAugmentation({id:this.parentElement.id});
+                }));
+                box.appendChild(this.createUserDefValueTitle(aug.name));
+                box.appendChild(this.createUserDefValueItem("Matching: " + 
+                    this.getConcatenatedObjectProp("name", aug.digitalCounterparts)));
+                box.onclick = function(){
+                    me.setCurrentAugmentation({id: this.id});
+                    me.loadAugmentationSetup();
+                }
+
+            this.append(box, "#augmentations");
+        };
+        MHAppsBuilder.prototype.removeAugmentation = function(aug){
+
+            MoWA.removeAugmentation(aug);
+            this.reloadAvailableAugmentations();
+        }
+        MHAppsBuilder.prototype.createNewEmptyAugmentation = function(){
+
+            MoWA.createNewEmptyAugmentation();
+        }
+
+
+        function SensorsLoadingData(){}
+        SensorsLoadingData.prototype.loadControlsData = function(){
+           appBuilder.loadAvailableAugmentations();
+        }
+
+            
+        window.onload = function(){
+
+            window.appBuilder = new MHAppsBuilder(); 
+            appBuilder.enableLoadingEffect();
+
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(new SensorsLoadingData()); 
+                appBuilder.disableLoadingEffect();
+            });
+
+            document.querySelector("#new-augmentation").onclick = function(){
+                appBuilder.createNewEmptyAugmentation();
+                appBuilder.loadAugmentationSetup();
+            }
+            document.querySelector(".previous > a").onclick = function(){
+                //appBuilder.loadUriWithApi("digital-counterparts/digital-counterparts.html");
+                appBuilder.goBackAStage();
+                appBuilder.loadUriWithApi("progress-point.html");
+            }
+            document.querySelector(".next > a").onclick = function(){
+                //appBuilder.loadUriWithApi("finalize-process.html");
+                appBuilder.loadUriWithApi("progress-point.html");
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span data-l10n-id="" >Augmentations</span> 
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+        <div class="progress heading-progress">
+            <div class="progress-bar progress-bar-info" style="width: 70%"></div>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p data-l10n-id="augmentations.help"></p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+            <!-- :::::::::: LIST OFCONTEXT VALUES :::::::::: -->
+            <div id="augmentations" class="list-group"></div>
+
+            <div class="form-group">
+                <button id="new-augmentation" type="button" class="btn pull-right btn-default">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+                    New augmentation
+                </button>
+            </div>
+        </form>
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='fa fa-caret-left'></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span data-l10n-id="next.step"></span>
+                    <i class="fa fa-caret-right"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

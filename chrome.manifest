@@ -1,0 +1,3 @@
+content     MoWA chrome/content/ contentaccessible=yes
+locale 		MoWA en-US chrome/locale/en-US/
+locale 		MoWA es-ES chrome/locale/es-ES/

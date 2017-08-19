@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+
+    <script type="text/javascript">
+
+        MHAppsBuilder.prototype.loadDigitalCounterparts = function(){
+            var dcs = MoWA.getDigitalCounterparts();   
+
+            if(dcs.length>0)
+                for (var i = dcs.length - 1; i >= 0; i--) {
+                    this.displayDCInList(dcs[i]);
+                }
+            else this.displayNoDC();
+        }
+        MHAppsBuilder.prototype.displayNoDC = function() {
+            var box = this.createNoItemBox(this.getLocalString('no.digital.counterpart'));
+            this.append(box, "#digitalCounterparts");
+        }
+        MHAppsBuilder.prototype.displayDCInList = function(dc) {
+
+            var me=this, box = this.createUserDefValueBox("list-group-item"); 
+                box.id = dc.id;
+                box.appendChild(this.createUserDefBoxControls(function(){
+                    e.stopImmediatePropagation(); e.preventDefault();
+                    me.removeDigitalCounterpart({id:this.parentElement.id});
+                }));
+                box.appendChild(this.createUserDefValueTitle(dc.getName()));
+                box.appendChild(this.createUserDefValueItem("Url: " + dc.getUrlPattern()));
+                box.onclick = function(){
+
+                    me.setCurrentDcId(this.id);
+                    me.loadDigitalCounterpartSetup();
+                }
+
+            this.append(box, "#digitalCounterparts");
+        }
+        MHAppsBuilder.prototype.removeDigitalCounterpart = function(aug){
+
+            MoWA.removeDigitalCounterpart(aug);
+            this.reloadAvailableDigitalCounterparts();
+        }
+        MHAppsBuilder.prototype.reloadAvailableDigitalCounterparts = function(){
+            document.querySelector("#digitalCounterparts").innerHTML = "";
+            this.loadDigitalCounterparts();
+        }
+        MHAppsBuilder.prototype.createNewEmptyDigitalCounterpart = function(){
+
+            MoWA.createNewEmptyDigitalCounterpart();
+        }
+
+        function SensorsLoadingData(){}
+        SensorsLoadingData.prototype.loadControlsData = function(){
+        }
+
+        try{
+            window.appBuilder = new MHAppsBuilder(); 
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(new SensorsLoadingData()); 
+                appBuilder.loadDigitalCounterparts();   
+                appBuilder.disableLoadingEffect();
+            });
+        }catch(err){console.log(err.message)}
+
+        window.onload = function(){
+            appBuilder.enableLoadingEffect();
+
+            if(MoWA.getCurrentDigitalCounterpart())
+                document.querySelector(".progress-bar").style.width = "60%";
+
+            document.querySelector("#new-digital-counterpart").onclick = function(){
+                appBuilder.createNewEmptyDigitalCounterpart();
+                appBuilder.loadDigitalCounterpartSetup();
+            }
+            document.querySelector(".previous > a").onclick = function(){
+                //appBuilder.navigateToPrevStepFromSensorForm();
+                appBuilder.goBackAStage();
+                appBuilder.loadUriWithApi("progress-point.html");
+            }
+            document.querySelector(".next > a").onclick = function(){    
+                //appBuilder.loadUriWithApi("augmentations/augmentations.html");
+                appBuilder.loadUriWithApi("progress-point.html");
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="green-navbar navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span data-l10n-id="" >Target Web apps</span> 
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+        <div class="progress heading-progress">
+            <div class="progress-bar progress-bar-info" style="width: 40%"></div>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p data-l10n-id="context.values.help"></p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+            <!-- :::::::::: LIST OFCONTEXT VALUES :::::::::: -->
+            <div id="digitalCounterparts" class="list-group"></div>
+
+            <div class="form-group">
+                <button id="new-digital-counterpart" type="button" class="btn pull-right btn-default">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+                    Add target Web app
+                </button>
+            </div>
+        </form>
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='fa fa-caret-left'></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span data-l10n-id="next.step"></span>
+                    <i class="fa fa-caret-right"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

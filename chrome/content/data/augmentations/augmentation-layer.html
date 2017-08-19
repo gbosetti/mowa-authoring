@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/augmentation-layer.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/tingle/dist/tingle.min.css">
+
+    <script type="text/javascript" src="../vendor/tingle/dist/tingle.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+
+    <script type="text/javascript">
+
+        MHAppsBuilder.prototype.loadUrlInAugmentationEditor = function(iframeSelector){
+
+            var dcId = MoWA.getCurrentAugmentation().getFirstDigitalCounterpart().id; //this is a shit
+            var dc = MoWA.getDigitalCounterpartById(dcId);
+            var me = this;
+            var url = dc.getDemoUrl(); //TODO: this call should dissapear when persistence is decoupled in a separate layer
+            if(url){
+
+                MoWA.enableAugmentersInteractionInBrowser({
+                    "iframeSelector": "#augmentation-browser",
+                    "messages": me.localizator.locale,
+                    "onThumbMoved": function(){
+                        alert("Allo!");
+                    }
+                });
+                MoWA.loadUrlInBrowser(
+                    '#augmentation-browser',
+                    url,
+                    function(url){
+
+                        MoWA.loadAugmentersStyleInBrowser("#augmentation-browser");
+                        me.disableLoadingEffect();
+                    },
+                    function(){
+                        me.enableLoadingEffect();
+                });
+            }
+            else alert("There is no target Web app with an URL associated to this augmentation.");
+        }
+        MHAppsBuilder.prototype.loadAugmentersStyleInBrowser = function(iframeSelector){
+            MoWA.loadAugmentersStyleInBrowser(iframeSelector);
+        }
+        MHAppsBuilder.prototype.getAugmentersData = function(iframeSelector){
+
+            //TODO: ver como pedirle a MoWA que devuelva esto automáticamented esde el Augmenter itself. Chusmear Extension Manager > getCurrentAugmenterInstance()
+            return MoWA.getAugmentersData();
+        }
+        MHAppsBuilder.prototype.askUserToSelectAugmenterToInsert = function() {
+
+            var self = this;
+            var dialog = new window.tingle.modal({
+                closeMethods: ['overlay', 'button', 'escape'],
+                footer: true,
+                stickyFooter: true
+            });
+            dialog.setContent("<h4>" + "Choose an augmenter:" + "</h4>");
+
+            var itemsToPresent = this.getAugmentersData();
+            for(i in itemsToPresent){
+
+                var btn = dialog.addFooterBtn(
+                    itemsToPresent[i].label,
+                    'tingle-btn tingle-btn--primary tingle-btn--pull-right',
+                    function(evt){
+
+                        dialog.close();
+                        MoWA.createNewThumbnail({
+                            id: new Date().getTime().toString(),
+                            iframeSelector: "#augmentation-browser",
+                            augmenter: this.mowaItem.augmenter,
+                            cog: this.mowaItem.cog,
+                            messages: appBuilder.localizator.locale
+                        });
+                });
+                btn.mowaItem = itemsToPresent[i];
+            }
+
+            dialog.open();
+        };
+
+
+
+
+
+        window.onload = function(){
+
+
+            window.appBuilder = new MHAppsBuilder();
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize();
+                appBuilder.adaptIBrowserHeight(
+                    [".navbar", ".navbar", ".previous > a"],
+                    "#augmentation-browser");
+
+                appBuilder.loadUrlInAugmentationEditor('#augmentation-browser');
+            });
+
+
+
+            //NAVIGATION
+            document.querySelector(".previous > a").onclick = function(){
+
+                appBuilder.loadAugmentationSetup();
+            }
+            document.querySelector(".center > a").onclick = function(){
+
+                appBuilder.askUserToSelectAugmenterToInsert();
+            }
+            document.querySelector(".next > a").onclick = function(){
+
+                appBuilder.manageAugmentations();
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span data-l10n-id="">Augmentation layer</span>
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+        <div class="progress heading-progress">
+            <div class="progress-bar progress-bar-info" style="width: 90%"></div>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p data-l10n-id="" ></p>
+        </div>
+
+        <iframe id="augmentation-browser" height="377px"></iframe>
+
+    </div>
+
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class="fa fa-caret-left"></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="center">
+                <a href="#">
+                    <span data-l10n-id="insert.augmenter">Insert augmenter</span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <i class="glyphicon glyphicon-floppy-disk"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

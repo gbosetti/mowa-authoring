@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+
+    <script type="text/javascript">
+
+        // Controller messages for this form
+        MHAppsBuilder.prototype.saveSensorOrientation = function(){
+
+            MoWA.setCurrentContextValue("name", document.querySelector("#orientation_name").value);
+            MoWA.setCurrentContextValue("alpha", document.querySelector("#orientation_alpha").value);
+            MoWA.setCurrentContextValue("beta", document.querySelector("#orientation_beta").value);
+            MoWA.setCurrentContextValue("gamma", document.querySelector("#orientation_gamma").value);
+            this.loadOrientationsManagement();
+        }
+        MHAppsBuilder.prototype.loadOrientationsManagement = function(){
+            MoWA.loadChromeFileWithApiAccess("sensors/config-orientations.html");
+        }
+        MHAppsBuilder.prototype.enableOrientationHandling = function(){
+            // Enabling sensing and handling the context values
+            function handleOrientation(event) {
+                document.querySelector("#orientation_alpha").value = event.alpha;
+                document.querySelector("#orientation_beta").value = event.beta;
+                document.querySelector("#orientation_gamma").value = event.gamma;
+            }
+            window.addEventListener("deviceorientation", handleOrientation, true);
+        }
+
+
+
+        // Form initialization
+        function SensorsLoadingData(){}
+        SensorsLoadingData.prototype.loadControlsData = function(){
+           window["Orientation"] = MoWA.loadContextValueClassInWindow("Orientation");
+        }
+
+        try{
+            window.appBuilder = new MHAppsBuilder();
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(new SensorsLoadingData());
+                appBuilder.disableLoadingEffect();
+            });
+        }catch(err){console.log(err.message)}
+
+        // Linking the UI components with the proper actions
+        window.onload = function(){
+            appBuilder.enableLoadingEffect();
+
+            $('form').validate({    
+                rules: {
+                    orientation_name: {
+                        minlength: 3,
+                        required: true
+                    }
+                }
+            });
+
+            document.querySelector(".previous > a").onclick = function(){
+                appBuilder.loadOrientationsManagement();
+            }
+            document.querySelector(".next > a").onclick = function(){
+                if($("form").valid())
+                    appBuilder.saveSensorOrientation();
+            }
+        }
+        appBuilder.enableOrientationHandling();
+
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="yellow-navbar navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span data-l10n-id="new.orientation" ></span>
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+        <div class="progress heading-progress">
+            <div class="progress-bar progress-bar-info" style="width: 25%"></div>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p data-l10n-id="" >Move your device to the orientation you want to record as the value of interest, then press save.</p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+
+            <!-- :::::::::: NAME :::::::::: -->
+            <div class="form-group">
+                <label data-l10n-id="">Name</label>
+                <input id="orientation_name" name="orientation_name" type="text" class="form-control" placeholder="E.g. vertical" required="true"></input>
+            </div>
+
+            <!-- :::::::::: ALPHA :::::::::: -->
+            <div class="form-group">
+                <label data-l10n-id="">Alpha</label>
+                <input id="orientation_alpha" type="text" class="form-control" required="true" readonly></input>
+            </div>
+
+            <!-- :::::::::: BETA :::::::::: -->
+            <div class="form-group">
+                <label data-l10n-id="">Beta</label>
+                <input id="orientation_beta" type="text" class="form-control" required="true" readonly></input>
+            </div>
+
+            <!-- :::::::::: GAMMA :::::::::: -->
+            <div class="form-group">
+                <label data-l10n-id="">Gamma</label>
+                <input id="orientation_gamma" type="text" class="form-control"  required="true" readonly></input>
+            </div>
+        </form>
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='fa fa-caret-left'></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span data-l10n-id="save"></span>
+                    <i class="fa fa-save"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/augmentation-layer.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/tingle/dist/tingle.min.css">
+
+    <script type="text/javascript" src="../vendor/tingle/dist/tingle.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+    <script type="text/javascript" src="../js/augmenter-parameters.js"></script>
+    
+    <script type="text/javascript">
+        MHAppsBuilder.prototype.loadFormTitle = function(){
+
+            var aug = MoWA.getCurrentAugmenterInstance(window);     
+            document.querySelector("#augmenterName").innerHTML = aug.getTitle() || "";
+        }
+        MHAppsBuilder.prototype.toggleInputStrategy = function(sel){
+
+            var container = document.querySelector("#input-strategy-area");
+                container.innerHTML = "";
+
+                /////// ERRORRRRRRRRRRRRRRRR
+            var callName = "load"+sel.options[sel.selectedIndex].value+"Strategy";
+            if(callName){
+                var specStrategy = this[callName]();
+                container.appendChild(specStrategy);
+            }    
+        }
+        MHAppsBuilder.prototype.loadPropertyBindedParameterStrategy = function(){
+
+            var formGroup = document.createElement("div");
+                formGroup.className = "form-group";
+
+            var dcData = MoWA.getCurrentAugmentation().getFirstDigitalCounterpart();
+            var dc = MoWA.getDigitalCounterpartById(dcData.id);
+            var props = dc.getAvailableProperties(); 
+
+            var inp = document.createElement("select");
+                inp.setAttribute("id", "dc-property");
+                inp.setAttribute("placeholder", "Enter some keywords here");
+                inp.className = "form-control"; 
+
+            for(i in props){
+                var opt = document.createElement("option");
+                    opt.innerHTML = i + ": " + props[i];
+                    opt.value = i;
+                    inp.appendChild(opt);
+            }
+            
+            formGroup.appendChild(inp);
+            return formGroup;
+        }
+        MHAppsBuilder.prototype.loadTextualParameterStrategy = function(){
+
+            var formGroup = document.createElement("div");
+                formGroup.className = "form-group";
+
+            var inp = document.createElement("input");
+                inp.setAttribute("id", "free-text");
+                inp.setAttribute("type", "text");
+                inp.className = "form-control"; 
+
+            formGroup.appendChild(inp);
+            return formGroup;
+        }
+
+
+        MHAppsBuilder.prototype.loadDCStrategyLabel = function(){
+
+            var currDcData = MoWA.getCurrentAugmentation().getFirstDigitalCounterpart();  
+            var dc = MoWA.getDigitalCounterpartById(currDcData.id);
+
+            document.querySelector("#PropertyBindedParameter").text = "One of the " + (dc.getName() || "target Web app") + "'s properties"
+        }
+        MHAppsBuilder.prototype.loadStoredValues = function(){
+
+            var inputSrategy = document.querySelector("#inputSrategy");
+            var strategy = MoWA.getCurrentAugmenter().getParameter("keywords");
+
+            if(strategy){
+                inputSrategy.value = strategy.className;
+                this.toggleInputStrategy(inputSrategy);
+                this["load"+strategy.className+"Field"]();
+            }
+        }
+        MHAppsBuilder.prototype.loadPropertyBindedParameterField = function(){
+
+            //TODO: esto mezcla persistencia y modelo
+            var keywordsControl = document.querySelector("#dc-property");
+            var param = MoWA.getCurrentAugmenter().getParameter("keywords");
+            
+            if(param){
+                //var dc = MoWA.getCurrentAugmentation().getFirstDigitalCounterpart();
+                //var dcProps = MoWA.getDigitalCounterpartById(dc.id).getAvailableProperties();
+                keywordsControl.value = (new TextualParameter(param)).getValue() || "";
+            }
+            
+        }
+        MHAppsBuilder.prototype.loadTextualParameterField = function(){
+
+            var keywordsControl = document.querySelector("#free-text");
+            var param = MoWA.getCurrentAugmenter().getParameter("keywords");
+            
+            if(param){
+                keywordsControl.value = (new TextualParameter(param)).getValue();
+            }
+        }
+        MHAppsBuilder.prototype.saveFields = function(){
+
+            var strategy = document.querySelector("#inputSrategy").value;
+
+            if(strategy){
+                this["save"+strategy+"Field"]();
+            }
+
+        }
+        MHAppsBuilder.prototype.savePropertyBindedParameterField = function(){
+
+            var value = document.querySelector("#dc-property").value;
+            if(value && value.length && value.trim().length > 0){
+
+                MoWA.setCurrentAugmenterParam("keywords", {
+                    "className": "PropertyBindedParameter", 
+                    "value": value,
+                    "dc": MoWA.getCurrentAugmentation().getFirstDigitalCounterpart().id
+                });
+                MoWA.saveAppInSessionIntoFile();
+            }
+
+            //setAttribute("id", "dc-property");
+
+        }
+        MHAppsBuilder.prototype.saveTextualParameterField = function(){
+
+            var value = document.querySelector("#free-text").value;
+            if(value && value.length && value.trim().length > 0){
+
+                MoWA.setCurrentAugmenterParam("keywords", {
+                    "className": "TextualParameter", 
+                    "value": value
+                });
+                MoWA.saveAppInSessionIntoFile();
+            }
+        }
+
+        
+
+        window.onload = function(){
+
+            window.appBuilder = new MHAppsBuilder(); 
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(); 
+                appBuilder.disableLoadingEffect();
+                appBuilder.loadDCStrategyLabel();
+                appBuilder.loadFormTitle();       
+                appBuilder.loadStoredValues();
+            });
+
+            appBuilder.enableLoadingEffect();
+            document.querySelector(".previous > a").onclick = function(){
+                appBuilder.loadUriWithApi("augmentations/augmentation-layer.html");
+            }
+            document.querySelector(".next > a").onclick = function(){    
+                appBuilder.saveFields();
+                appBuilder.loadUriWithApi("augmentations/augmentation-layer.html");
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span id="augmenterName"></span> 
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+
+        <div class="help">
+            <p>This augmenter requires some keywords to look for a matching video. You can use the "dynamic" value of any of the target Web app's properties, or you can write a fixed value.</p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+            <!-- :::::::::: Keywords from :::::::::: -->
+            <div class="form-group">
+                <label id="dc-prop-label">Keywords from</label>
+                <select id="inputSrategy" class="form-control" onchange="appBuilder.toggleInputStrategy(this)">
+                    <option id="PropertyBindedParameter" value="PropertyBindedParameter">One of the "dynamic" dgital counterpart's property</option>
+                    <option value="TextualParameter">A specific "fixed" text</option>
+                </select>
+            </div>
+
+            
+            <!-- :::::::::: INPUT STRATEGY AREA :::::::::: -->
+            <div id="input-strategy-area">
+            </div>
+
+            <!--videoType videoSrc-->
+
+        </form>
+
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='fa fa-caret-left'></i>
+                    <span data-l10n-id="step.back"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span data-l10n-id="save"></span>
+                    <i class="glyphicon glyphicon-floppy-disk"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

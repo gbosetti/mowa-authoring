@@ -1,0 +1,52 @@
+.borderless-list-group li{
+    border: none !important;
+    padding: 15px 15px;
+}
+.done-item{
+    text-decoration:line-through;
+    color: #b0b0b0;
+}
+.todo-item .bigger{
+    display: none;
+}
+.done-items .bigger{
+    font-size: 1.5em;
+}
+
+.blue-badge{
+    color: #178acc !important;
+}
+.red-badge{
+    color: #c71c22 !important;
+}
+.green-badge{
+    color: #96B475 !important;
+}
+.yellow-badge{
+    color: #F1B500 !important;
+}
+.light-blue-badge{
+    color: #54b4eb !important;
+}
+
+.hidden-element{
+	display: none;
+}
+
+/* SHARE BUTTONS */
+.share-buttons {
+    width: 100%;
+    text-align: center;
+}
+.share-buttons .fb {
+    color: #3B5998;
+}
+.share-buttons .tw {
+    color: #50ABF1;
+}
+.share-buttons .google {
+    color: #D6492E;
+}
+.share-buttons .mail {
+    color: #DA3B32;
+}

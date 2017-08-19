@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+	    <title>MoWA Authoring</title>
+
+	    <link type="text/css" rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css"/> 
+	    <link type="text/css" rel="stylesheet" href="lib/css/progress-point.css"/>
+		<link type="text/css" rel="stylesheet" href="lib/css/base-forms.css"/>
+		<link type="text/css" rel="stylesheet" href="vendor/bootswatch/cerulean/bootstrap.min.css"/>
+	    <link type="text/css" rel="stylesheet" href="vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+
+		<script type="text/javascript" src="vendor/jquery/jquery.min.js"></script>
+		<script type="text/javascript" src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="lib/js/app-builder.js"></script>
+
+	    <script type="text/javascript">
+	    	
+		    window.onload = function(){
+
+		    	window.appBuilder = new MHAppsBuilder(); 
+		    	appBuilder.enableLoadingEffect();
+		    	
+	            appBuilder.startBuildingProcess(function(){
+
+	                appBuilder.stageState = new window[MoWA.getProgressPoint()];
+	                appBuilder.disableLoadingEffect();
+	                appBuilder.stageState.updateProgressBarValue();
+	                appBuilder.stageState.enableSteps();
+	                appBuilder.initialize();    
+	            });
+	            document.querySelector(".previous > a").onclick = function(){
+	                appBuilder.stageState.goPrevious();
+	            };
+	            document.querySelector(".next > a").onclick = function(){
+	                appBuilder.stageState.goNext();
+	            };
+	        }
+	    </script>
+	</head>
+		<body>
+		    <!--HEADER-->
+		    <div class="yellow-navbar navbar navbar-default navbar-fixed-top" style="backgrpund: #EB4134">
+		        <div class="navbar-header">
+		            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+		                <img style="max-width:100px; margin-top: -7px;" src="lib/img/mowa-icon.png">
+		                &nbsp;&nbsp;
+		                <span>Your progress</span> 
+		            </a>
+		            <button style="border:none" class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription('MobileHypermediaApp.xml');">
+		                <i class="fa "></i>
+		            </button>
+		        </div>
+		        <div class="progress heading-progress">
+		            <div id="progress-bar" class="progress-bar progress-bar-info" style="width: 0%"></div>
+		        </div>
+		    </div>
+		    <!--FORM-->
+
+		    <div class="container form-container">
+
+
+		    <br>
+				<ul class="list-group borderless-list-group" style="font-size: 1.1em;">
+		        	<li id="step1" class="list-group-item todo-item">
+					  	1. Name the app
+					  	<span class="pull-right bigger glyphicon glyphicon-ok-sign yellow-badge"></span>
+					</li>
+					<li id="step2" class="list-group-item todo-item">
+						2. Choose sensors
+						<span class="pull-right bigger glyphicon glyphicon-ok-sign yellow-badge"></span>
+					</li>
+					<li id="step3" class="list-group-item todo-item">
+						3. Choose context values
+						<span class="pull-right bigger glyphicon glyphicon-ok-sign yellow-badge"></span>
+					</li>
+					<li id="step4" class="list-group-item todo-item">
+						4. Choose target Web apps
+						<span class="pull-right bigger glyphicon glyphicon-ok-sign yellow-badge"></span>
+					</li>
+					<li id="step5" class="list-group-item todo-item">
+						5. Create augmentations
+						<span class="pull-right bigger glyphicon glyphicon-ok-sign yellow-badge"></span>
+					</li>
+				</ul>
+
+				<div class="hidden-element" style="margin-top: 10px;">
+					<div class="share-buttons">
+						<h3 data-i18n="preventing_mobile.share"></h3>
+					    <div class="btn-group">
+					        <a id="share_facebook" class="btn btn-default btn-lg" target="_blank" title="On Facebook" href="#">
+					            <i class="fa fa-facebook fa-lg fb"></i>
+					        </a>
+					        <a id="share_twitter" class="btn btn-default btn-lg" target="_blank" title="On Twitter" href="#">
+					            <i class="fa fa-twitter fa-lg tw"></i>
+					        </a>
+					        <a id="share_google_plus" class="btn btn-default btn-lg" target="_blank" title="On Google Plus" href="#">
+					            <i class="fa fa-google-plus fa-lg google"></i>
+					        </a>
+					        <a id="share_email" class="btn btn-default btn-lg" target="_blank" title="through e-mail" href="#">
+					            <i class="fa fa-envelope fa-lg mail"></i>
+					        </a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--FOOTER-->
+			<footer>
+				<ul class="pager">
+					<li class="previous">
+		                <a href="#">
+		                    <i class='fa fa-caret-left'></i>
+		                    <span data-l10n-id="step.back"></span>
+		                </a>
+		            </li>
+		            <li class="next">
+		                <a href="#">
+		                    <span data-l10n-id="next.step"></span>
+		                    <i class="fa fa-caret-right"></i>
+		                </a>
+		            </li>
+				</ul>
+			</footer>
+		</body>
+</html>

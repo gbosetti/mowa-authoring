@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0; target-densityDpi=device-dpi"/>
+
+	<title>MoWA Authoring</title>
+	<link type="text/css" rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css"/> 
+	<link type="text/css" rel="stylesheet" href="lib/css/base-forms.css"/>
+	<link type="text/css" rel="stylesheet" href="vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="vendor/tingle/dist/tingle.min.css">
+	
+	<script type="text/javascript" src="vendor/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="vendor/tingle/dist/tingle.min.js"></script>
+	<script type="text/javascript" src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="lib/js/app-builder.js"></script>
+	<script type="text/javascript">
+
+		MHAppsBuilder.prototype.loadAuthoredApp =  function(params){
+
+		    var aManager = this, a = this.createAppListItem(params);
+		    $(a).on("click", function(evt) {
+	            evt.preventDefault(); evt.stopImmediatePropagation();
+	            if(MoWA.loadAppFromFile(this.filename))
+	            	MoWA.loadChromeFileWithApiAccess("application-setup.html");
+		    });
+		}
+		MHAppsBuilder.prototype.reloadAvailableApps = function(){
+            document.querySelector('#app-instances-list').innerHTML = "";
+            this.loadAuthoredApps('app-instances-list');
+        }
+		MHAppsBuilder.prototype.loadAuthoredApps = function(divId){
+
+		    //TODO: So similar to loadExtensibleMowaApps
+		    var appsData = MoWA.getAuthoredAppsData(); //It could be an error here
+		    if(appsData.length < 1){
+		        this.loadAuthoredAppsNotFound(divId);
+		        return;
+		    }
+		    for (var i = 0; i < appsData.length; i++) {
+		        if(!appsData[i].getDisplayName()) {
+		            this.loadCorruptedAuthoredApp({
+		                divId: divId,
+		                description: this.getLocalString('corrupted.app') + " " + appsData[i].getFilename(),
+		                filename: appsData[i].getFilename(),
+		                content: appsData[i].getContent()
+		            });
+		        }
+		        else { this.loadAuthoredApp({
+		                description: '<i class="fa fa-caret-right"></i> ' + appsData[i].getDisplayName(),
+		                styleClasses: 'list-group-item',
+		                parentId: divId,
+		                content: appsData[i].getContent(), /*this is plain text...*/
+		                filename: appsData[i].getFilename()
+		            });
+		        }
+		    };
+		}
+
+		window.appBuilder = new MHAppsBuilder();
+		appBuilder.startBuildingProcess(function(){
+			MoWA.setProgressPoint("StageOne");
+			appBuilder.initialize();
+		    appBuilder.loadAuthoredApps('app-instances-list');
+		    appBuilder.disableLoadingEffect();
+		});
+
+		window.onload = function(){
+
+			appBuilder.enableLoadingEffect();
+			document.getElementById("extend-app").onclick = function(){
+
+				MoWA.createNewAppConfiguration();
+		        MoWA.loadChromeFileWithApiAccess("application-setup.html");
+			}
+		}
+	</script>
+</head>
+<body>
+	<!--HEADER-->
+	<div class="navbar navbar-default navbar-fixed-top">
+		<div class="navbar-header">
+			<a href="#" class="navbar-brand">
+				<img style="max-width:100px; margin-top: -7px;" src="lib/img/mowa-icon.png">
+				<span data-l10n-id="apps.management.title" ></span>
+			</a>
+			<button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+				<i class="fa fa-info-circle"></i>
+			</button>
+		</div>
+	</div>
+	<!--FORM-->
+	<div class="container form-container">
+		<div class="help">
+			<p data-l10n-id="apps.management.description" ></p>
+		</div>
+		<div id="app-instances" class="list-group" style="margin-top: -10px;">
+			<h4 id="app-instances-header" class="list-group-heading list-group-item" data-l10n-id="authored.apps.instances"></h4>
+			<div id="app-instances-list" class="list-group"></div>
+		</div>
+	</div>
+	<!--FOOTER-->
+	<footer>
+		<ul class="pager">
+			<li class="previous">
+				<a href="#" id="clear-logs" onclick="appBuilder.closeAuthoringTool()">
+					<i class="glyphicon glyphicon-resize-small"></i>
+					<span data-l10n-id="exit"></span>
+				</a>
+			</li>
+			<li class="next">
+				<a href="#" id="extend-app">
+					<span data-l10n-id="apps.extend"></span>
+					<i class="fa fa-caret-right"></i>
+				</a>
+			</li>
+		</ul>
+	</footer>
+</body>
+</html>

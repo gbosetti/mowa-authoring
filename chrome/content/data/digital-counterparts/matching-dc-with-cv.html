@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+    
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+    
+    <script type="text/javascript">
+    	MHAppsBuilder.prototype.createContextValueForChecking = function(itemId, displayName, parentId){
+
+		    var ul = document.getElementById(parentId);
+		    var li = this.createItemForCkecking(
+		        itemId, //not the css
+		        displayName, 
+		        {}, //data
+		        "application.contextManagers.OrientationManager.values." + itemId + ".checked", 
+		        function(evt){
+		            this.spec.checked = this.checked;
+		            if(this.checked)
+		                MoWA.addSensorSpec(this.spec);
+		            else MoWA.removeSensorSpec(this.spec);
+		        }
+		    );
+		    ul.appendChild(li);
+		}
+		MHAppsBuilder.prototype.loadDigitalCounterpartsToBeMatched = function(){
+            
+            var contextValues = MoWA.getAllContextValues();
+            for (var i = 0; i < contextValues.length; i++) {
+            	this.createContextValueForChecking(
+            		contextValues[i].name, 
+            		contextValues[i].name, 
+            		"availableContextValues"
+            	);
+            }
+        }
+
+        //Instantiating the appBuilder
+        try{
+            window.appBuilder = new MHAppsBuilder(); 
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(); 
+                appBuilder.loadDigitalCounterpartsToBeMatched();
+                appBuilder.disableLoadingEffect();
+            });
+        }catch(err){console.log(err.message)}
+
+        window.onload = function(){
+            appBuilder.enableLoadingEffect();
+            document.querySelector(".previous > a").onclick = function(){
+                appBuilder.manageDigitalCounterparts();
+            }
+            document.querySelector(".next > a").onclick = function(){ ;              
+                appBuilder.manageDigitalCounterparts();
+            }
+        }
+    </script>
+</head>
+	<body>
+	    <!--HEADER-->
+	    <div class="green-navbar navbar navbar-default navbar-fixed-top">
+	        <div class="navbar-header">
+	            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+	                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+	                &nbsp;&nbsp;
+	                <span data-l10n-id="">Target Web app</span> 
+	            </a>
+	            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+	                <i class="fa fa-info-circle"></i>
+	            </button>
+	        </div>
+	        <div class="progress heading-progress">
+            <div class="progress-bar progress-bar-info" style="width: 60%"></div>
+        </div>
+	    </div>
+	    <!--FORM-->
+		<form class="sidebar-form">
+			<h4 class="list-group-heading list-group-item">Available context values</h4>
+            <div class="form-group">
+                <!-- List group -->
+                <ul id="availableContextValues" class="list-group list-of-sources"></ul>
+            </div>
+        </form>
+	    <!--FOOTER-->
+	    <footer>
+	        <ul class="pager">
+	            <li class="previous">
+	                <a href="#">
+	                    <i class='fa fa-caret-left'></i>
+	                    <span data-l10n-id="step.back"></span>
+	                </a>
+	            </li>
+	            <li class="next">
+	                <a href="#">
+	                    <span data-l10n-id="save"></span>
+	                    <i class="fa fa-save"></i>
+	                </a>
+	            </li>
+	        </ul>
+	    </footer>
+	</body>
+</html>

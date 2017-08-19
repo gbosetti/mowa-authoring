@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=no; target-densityDpi=device-dpi"/>
+    <title>MoWA Authoring</title>
+    
+    <link type="text/css" rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/> 
+    <link type="text/css" rel="stylesheet" href="../lib/css/validate.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/progress-point.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/base-forms.css"/>
+    <link type="text/css" rel="stylesheet" href="../lib/css/material-switch.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootswatch/cerulean/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../vendor/bootstrap-legacy/docs/assets/css/bootstrap-responsive.css"/>
+
+    <script type="text/javascript" src="../vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../lib/js/app-builder.js"></script>
+    
+    <script type="text/javascript">
+
+        MHAppsBuilder.prototype.loadUrlInIframe = function(iframeSelector){
+
+            this.enableLoadingEffect();
+            var me=this, userEntry = appBuilder.getUrlForSearching(document.querySelector("#url").value);
+            MoWA.loadUrlInBrowser(
+                iframeSelector, 
+                userEntry, 
+                function(url){
+                    window.lastVisitedUrl = url; 
+                    me.disableLoadingEffect();
+                },
+                function(){
+                    me.enableLoadingEffect();
+            });
+        }
+
+        function SensorsLoadingData(){}
+        SensorsLoadingData.prototype.loadControlsData = function(){
+            
+            var dc = MoWA.getCurrentDigitalCounterpart();
+            var url = document.querySelector("#url");
+                url.setAttribute("data-model", "application.digitalCounterparts." + dc.id + ".url");
+        }
+
+
+        window.onload = function(){
+
+            window.appBuilder = new MHAppsBuilder(); 
+            appBuilder.enableLoadingEffect();
+
+            appBuilder.startBuildingProcess(function(){
+                appBuilder.initialize(new SensorsLoadingData()); 
+                appBuilder.resizeIframeToForm("#mowa-external-content");
+                appBuilder.loadUrlInIframe('#mowa-external-content');
+                appBuilder.disableLoadingEffect();
+            });
+            
+            document.querySelector(".previous > a").onclick = function(){
+                appBuilder.loadDigitalCounterpartSetup();
+            }
+            document.querySelector(".next > a").onclick = function(){   
+                appBuilder.setCurrentDigitalCounterpartValue("url", window.lastVisitedUrl);   
+                appBuilder.setCurrentDigitalCounterpartValue("urlPattern", window.lastVisitedUrl);        
+                appBuilder.loadDigitalCounterpartSetup();
+            }
+        }
+    </script>
+</head>
+<body>
+    <!--HEADER-->
+    <div class="green-navbar navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="../" class="navbar-brand" onclick="appBuilder.manageApplications()">
+                <img style="max-width:100px; margin-top: -7px;" src="../lib/img/mowa-icon.png">
+                &nbsp;&nbsp;
+                <span data-l10n-id="">URL selection</span> 
+            </a>
+            <button class="navbar-toggle mowa-navbar-icon" type="button" onclick="appBuilder.toggleDescription();">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </div>
+    </div>
+    <!--FORM-->
+    <div class="container form-container">
+        <div class="help">
+            <p data-l10n-id="url.selection" ></p>
+        </div>
+
+        <form id="edit-concept-template-form" class="sidebar-form">
+
+            <!-- :::::::::: URL :::::::::: -->
+            <div id="url-form-group" class="form-group">
+                <div class="input-group">
+                      <input id="url" type="text" class="form-control" placeholder="Type a URL" data-model="application."/>
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" onclick="appBuilder.loadUrlInIframe('#mowa-external-content')">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                      </span>
+                </div><!-- /input-group -->
+            </div>
+
+            <div class="form-group">
+                <iframe id="mowa-external-content" class="content-browser"></iframe>
+            </div>
+        </form>
+    </div>
+    <!--FOOTER-->
+    <footer>
+        <ul class="pager">
+            <li class="previous">
+                <a href="#">
+                    <i class='glyphicon glyphicon-remove'></i>
+                    <span data-l10n-id="cancel"></span>
+                </a>
+            </li>
+            <li class="next">
+                <a href="#">
+                    <span>Use it </span>
+                    <i class="glyphicon glyphicon-floppy-disk"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>
