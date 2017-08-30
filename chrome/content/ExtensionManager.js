@@ -552,7 +552,7 @@ ExtensionManager.prototype.getAvailableSensors = function(){
         {
         	className: "LightLevel",
         	displayName: "Light level",
-        	configForm: "sensors/config-luxes.html",
+        	configForm: "sensors/config-luxes.html", 
         	manager: "LightLevelBuilder",
         	src: "context-types/sensors/LightLevelSensor.js",
         	jsm: "context-types/luxes.jsm"

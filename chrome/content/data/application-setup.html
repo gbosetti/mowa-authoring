@@ -19,6 +19,10 @@
 
             document.querySelector("#application_name").value = MoWA.getAppData("name") || "";
         }
+        MHAppsBuilder.prototype.loadAugmentationStrategy = function(iframeSelector){
+
+            document.querySelector("#augmentation_strategy").value = MoWA.getAppData("augmentation-strategy") || "MatchPageAndAugment";
+        }
         MHAppsBuilder.prototype.loadFormValidation = function(){
 
             $('form').validate({    
@@ -29,8 +33,7 @@
                     }
                 }
             });
-        }
-        
+        }    
         window.onload = function(){
 
             window.appBuilder = new MHAppsBuilder(); 
@@ -38,6 +41,7 @@
                 appBuilder.initialize(); 
                 appBuilder.disableLoadingEffect();
                 appBuilder.loadAppName();
+                appBuilder.loadAugmentationStrategy();
                 appBuilder.loadFormValidation();
             });
 
@@ -50,9 +54,12 @@
                 if($("form").valid())
                     MoWA.loadChromeFileWithApiAccess("sensors-selection.html");
             }
+            document.querySelector("#augmentation_strategy").onchange = function(){
+                MoWA.setAppData("augmentation-strategy", this.value);
+            } 
             document.querySelector("#application_name").onchange = function(){
                 MoWA.setAppData("name", this.value);
-            }   
+            }  
         }
     </script>
 </head>
@@ -86,6 +93,15 @@
             <div class="form-group">
                 <label data-l10n-id="app.setup.name"></label>
                 <input id="application_name" name="application_name" type="text" class="form-control" placeholder="E.g. Darwin's tour" required="true"></input>
+            </div>
+
+            <!-- :::::::::: AUGMENTATION STRATEGY :::::::::: -->
+            <div class="form-group">
+                <label data-l10n-id="augmentation.strategy"></label>
+                <select id="augmentation_strategy" class="form-control" onchange="">
+                    <option value="MatchPageAndAugment">Augment on matching URL</option>
+                    <option value="OpenAndAugment">Open matching URL and augment</option>
+                </select>
             </div>
         </form>
     </div>

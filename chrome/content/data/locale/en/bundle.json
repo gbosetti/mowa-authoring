@@ -64,6 +64,7 @@
 	"app.setup.title": "Application setup",
 	"app.setup.description": "Please, choose a name for your application",
 	"app.setup.name": "Name",
+	"augmentation.strategy": "Augmentation strategy",
 	"app.setup.space":"Context representation",
 	"app.setup.sensors": "Sensors to use",
 	"sensors.selection.description": "Enable the sensors you want to use in your augmentations",
