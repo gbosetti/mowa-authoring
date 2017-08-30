@@ -23,21 +23,48 @@
 
             MoWA.createNewEmptyContextValueByManager("LightLevelBuilder")
         }
+        MHAppsBuilder.prototype.removeContextValue = function(id){
+
+            MoWA.removeContextValue("LightLevelBuilder", id);
+            this.reloadAvailableLuxes();
+        }
+        MHAppsBuilder.prototype.reloadAvailableLuxes = function(){
+            document.querySelector("#luxes").innerHTML = "";
+            this.loadAvailableLuxes();
+        }
+        MHAppsBuilder.prototype.displayInList = function(lux) {
+
+            var me = this;
+            var box = this.createUserDefValueBox("list-group-item"); 
+                box.id = lux.id;
+                box.appendChild(this.createUserDefBoxControls(function(evt){
+                    evt.stopImmediatePropagation(); evt.preventDefault(); 
+                    me.removeContextValue(this.parentElement.id);
+                }));
+                box.appendChild(this.createUserDefValueTitle(lux.name));
+                box.appendChild(this.createUserDefValueItem("Lux value: " + lux.lux));
+                box.onclick = function(){
+                    me.setCurrentContextValueId(lux.id);
+                    me.loadLightLevelSetup();
+                }
+
+            this.append(box, "#luxes");
+        };        
+        MHAppsBuilder.prototype.loadAvailableLuxes = function(){
+            var luxes = MoWA.getContextValuesByManager("LightLevelBuilder");
+            if(luxes.length > 0)
+                for (var i = luxes.length - 1; i >= 0; i--) {
+                    appBuilder.displayInList(luxes[i]);
+                }
+            else appBuilder.displayNoResultsBox("luxes", "#luxes");
+        }
 
         // Form initialization
         try{
             window.appBuilder = new MHAppsBuilder();
             appBuilder.startBuildingProcess(function(){
                 appBuilder.initialize();
-
-                var luxes = MoWA.getContextValuesByManager("LightLevelBuilder");
-
-                //TIENEN REALMENTE ESTE MÉTODO? POR QUÉ VIENE UN UNDEFINED???????
-                for (var i = luxes.length - 1; i >= 0; i--) {
-
-                    luxes[i].displayInList(appBuilder);
-                }
-
+                appBuilder.loadAvailableLuxes();     
                 appBuilder.setCurrentContextManager("LightLevelBuilder");
                 appBuilder.disableLoadingEffect();
             });

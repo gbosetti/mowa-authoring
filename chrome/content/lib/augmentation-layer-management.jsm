@@ -268,7 +268,7 @@ AugmentationLayerManager.prototype.loadUserSelectedSensors = function(selectedSe
 
 	this.sensors = {};
 
-	this.evaluateInSandbox("defaults/sensors/AbstractSensor.js");
+	this.evaluateInSandbox("context-types/sensors/AbstractSensor.js");
 	for (var i in selectedSensors) {  
 		try{
 			this.evaluateInSandbox(selectedSensors[i].src);

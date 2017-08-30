@@ -822,6 +822,11 @@ MHAppsBuilder.prototype.createUserDefBoxControls = function(onClick){
 
     return remove;
 }
+MHAppsBuilder.prototype.displayNoResultsBox = function(resultsName, selector) {
+
+    var box = this.createNoItemBox("You have no " + resultsName + " defined for this app. Please, create at least one.");
+    this.append(box, selector);
+};
 MHAppsBuilder.prototype.append = function(elem, at){
     document.querySelector(at).appendChild(elem);
 }

@@ -561,7 +561,7 @@ ExtensionManager.prototype.getAvailableSensors = function(){
         	className: "DeviceOrientation",
         	displayName: "Orientation",
         	configForm: "sensors/config-orientations.html",
-        	manager: "OrientationManager",
+        	manager: "OrientationBuilder",
         	src: "context-types/sensors/DeviceOrientationSensor.js",
         	jsm: "context-types/orientation.jsm"
         }

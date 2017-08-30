@@ -15,22 +15,6 @@ function LightLevel(props) { //.lux
 
 		return new ctx["LightLevel"](this.lux); 
 	};
-	this.displayInList = function(ui) {
-
-		var box = ui.createUserDefValueBox("list-group-item"); 
-			box.id = this.id;
-			box.appendChild(ui.createUserDefBoxControls(function(){
-				alert("removing");
-			}));
-			box.appendChild(ui.createUserDefValueTitle(this.name));
-			box.appendChild(ui.createUserDefValueItem("Lux value: " + this.lux));
-			box.onclick = function(){
-				ui.setCurrentContextValueId(this.id);
-				ui.loadLightLevelSetup();
-			}
-
-		ui.append(box, "#luxes");
-	};
 }
 
 function LightLevelBuilder(props){

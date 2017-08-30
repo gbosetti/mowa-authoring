@@ -286,7 +286,7 @@ SessionManager.prototype.getContextValuesByManager = function(keyManager){
 
 	if (hasValues)
 		return manager.getValues();
-	return [manager.getNoContextValue()];
+	return [];
 }
 SessionManager.prototype.getPrevSensorToCog = function(){
 

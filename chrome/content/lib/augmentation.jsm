@@ -2,7 +2,7 @@ var EXPORTED_SYMBOLS = ["Augmentation", "Augmenter"];
 
 function Augmentation(data){
 
-	this.name = "Demo augmentation";
+	this.name = "";
 	this.digitalCounterparts = {}; //this should be just one, to avoid problems with DOM structure and locators
 	this.augmenters = {};
 

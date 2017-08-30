@@ -21,7 +21,43 @@
 
         MHAppsBuilder.prototype.createNewEmptyContextValue = function(){
 
-            MoWA.createNewEmptyContextValueByManager("OrientationManager")
+            MoWA.createNewEmptyContextValueByManager("OrientationBuilder")
+        }
+        MHAppsBuilder.prototype.displayInList = function(orientation) {
+
+            var me = this;
+            var box = this.createUserDefValueBox("list-group-item"); 
+                box.id = orientation.id;
+                box.appendChild(this.createUserDefBoxControls(function(evt){
+                    evt.stopImmediatePropagation(); evt.preventDefault(); 
+                    me.removeOrientation(this.parentElement.id)
+                }));
+                box.appendChild(this.createUserDefValueTitle(orientation.name));
+                box.appendChild(this.createUserDefValueItem("Alpha: " + orientation.alpha + 
+                    " - Beta: " + orientation.beta + " - Gamma: " + orientation.gamma));
+                box.onclick = function(){
+                    me.setCurrentContextValueId(orientation.id);
+                    me.loadOrientationSetup();
+                }
+
+            this.append(box, "#orientations");
+        };
+        MHAppsBuilder.prototype.removeOrientation = function(id){
+
+            MoWA.removeContextValue("OrientationBuilder", id);
+            this.reloadAvailableOrientations();
+        }
+        MHAppsBuilder.prototype.reloadAvailableOrientations = function(){
+            document.querySelector("#orientations").innerHTML = "";
+            this.loadAvailableOrientations();
+        }     
+        MHAppsBuilder.prototype.loadAvailableOrientations = function(){
+            var orientations = MoWA.getContextValuesByManager("OrientationBuilder");
+            if(orientations.length > 0)
+                for (var i = orientations.length - 1; i >= 0; i--) {
+                    appBuilder.displayInList(orientations[i]);
+                }
+            else appBuilder.displayNoResultsBox("orientations", "#orientations");
         }
 
         // Form initialization
@@ -29,16 +65,8 @@
             window.appBuilder = new MHAppsBuilder();
             appBuilder.startBuildingProcess(function(){
                 appBuilder.initialize();
-
-                var orientations = MoWA.getContextValuesByManager("OrientationManager");
-
-                //TIENEN REALMENTE ESTE MÉTODO? POR QUÉ VIENE UN UNDEFINED???????
-                for (var i = orientations.length - 1; i >= 0; i--) {
-
-                    orientations[i].displayInList(appBuilder);
-                }
-
-                appBuilder.setCurrentContextManager("OrientationManager");
+                appBuilder.loadAvailableOrientations();
+                appBuilder.setCurrentContextManager("OrientationBuilder");
                 appBuilder.disableLoadingEffect();
             });
         }catch(err){console.log(err.message)}
